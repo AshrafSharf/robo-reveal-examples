@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Robo-Reveal Examples</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        h1 {
+            color: #333;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+        .example-list {
+            list-style: none;
+            padding: 0;
+        }
+        .example-item {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .example-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .example-item h3 {
+            margin-top: 0;
+            color: #667eea;
+        }
+        .example-item p {
+            color: #666;
+            margin: 10px 0;
+        }
+        .run-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: opacity 0.2s;
+        }
+        .run-button:hover {
+            opacity: 0.9;
+        }
+        .code-snippet {
+            background: #f8f8f8;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎯 Robo-Reveal Examples</h1>
+    <p>Click on any example to run it in your browser:</p>
+    
+    <ul class="example-list">
+        <li class="example-item">
+            <h3>01. Basic Presentation</h3>
+            <p>Learn the fundamentals of creating presentations with robo-reveal.</p>
+            <div class="code-snippet">const presentation = new Presentation();</div>
+            <a href="run-example.html?example=01-basic-presentation" class="run-button">▶ Run Example</a>
+        </li>
+        
+        <li class="example-item">
+            <h3>02. Layout Examples</h3>
+            <p>Explore Stack, HStack, VStack, and other layout components.</p>
+            <div class="code-snippet">new VStack().h1('Title').p('Content');</div>
+            <a href="run-example.html?example=02-layout-examples" class="run-button">▶ Run Example</a>
+        </li>
+        
+        <li class="example-item">
+            <h3>03. Semantic API</h3>
+            <p>Build presentations without HTML strings using semantic methods.</p>
+            <div class="code-snippet">.h2('Title').ul(['Item 1', 'Item 2'])</div>
+            <a href="run-example.html?example=03-semantic-api" class="run-button">▶ Run Example</a>
+        </li>
+        
+        <li class="example-item">
+            <h3>04. Complex Lists</h3>
+            <p>Create lists with math equations, custom styles, and fragments.</p>
+            <div class="code-snippet">.ul([{ math: 'E=mc^2', style: '...' }])</div>
+            <a href="run-example.html?example=04-complex-lists" class="run-button">▶ Run Example</a>
+        </li>
+        
+        <li class="example-item">
+            <h3>05. List Options</h3>
+            <p>Understand automatic fragments and list configuration options.</p>
+            <div class="code-snippet">.ul(['Auto', 'Fragments!'])</div>
+            <a href="run-example.html?example=05-list-options" class="run-button">▶ Run Example</a>
+        </li>
+    </ul>
+    
+    <h2>📚 How to Run</h2>
+    <ol>
+        <li>Install dependencies: <code>npm install</code></li>
+        <li>Run dev server: <code>npm run dev</code></li>
+        <li>Or run specific example: <code>npm run start</code> and edit index.html</li>
+    </ol>
+</body>
+</html>

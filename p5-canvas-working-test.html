@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>P5Canvas Working Test - Robo-Reveal</title>
+    
+    <!-- Reveal.js CSS from CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.0.4/dist/reveal.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.0.4/dist/theme/white.css">
+    
+    <!-- Robo-Reveal custom styles -->
+    <link rel="stylesheet" href="../styles/robo-reveal.css">
+    
+    <!-- KaTeX styles (needed for AnimatedDiagram math rendering) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+    
+    <style>
+        /* Ensure presentation container takes full viewport */
+        html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        
+        #presentation-container {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .reveal {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .reveal .slides section {
+            width: 100%;
+            height: 100%;
+        }
+        
+        /* Stack layouts */
+        .reveal .r-vstack {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .reveal .r-hstack {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+        
+        /* Ensure graph containers maintain their size */
+        .reveal .r-hstack > div {
+            flex-shrink: 0;
+        }
+        
+        .graph-item {
+            width: 100% !important;
+            height: 100% !important;
+        }
+        
+        /* Control panel styles */
+        .zoom-controls {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            z-index: 100;
+            font-size: 14px;
+        }
+        
+        .zoom-controls button {
+            display: block;
+            margin: 5px 0;
+            padding: 5px 10px;
+            cursor: pointer;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            font-size: 12px;
+        }
+        
+        .zoom-controls button:hover {
+            background: #45a049;
+        }
+        
+        .zoom-controls h4 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        
+        .zoom-controls input[type="range"] {
+            width: 120px;
+        }
+        
+        .zoom-controls label {
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div id="presentation-container"></div>
+    
+    <!-- Load dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.0.4/dist/reveal.js"></script>
+    
+    <!-- p5.js from CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
+    
+    <!-- Load the presentation -->
+    <script type="module">
+        import './p5-canvas-working-test.js';
+    </script>
+</body>
+</html>

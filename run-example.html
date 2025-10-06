@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Robo-Reveal Example Runner</title>
+    
+    <!-- Reveal.js CSS -->
+    <link rel="stylesheet" href="../node_modules/reveal.js/dist/reveal.css">
+    <link rel="stylesheet" href="../node_modules/reveal.js/dist/theme/white.css">
+    <link rel="stylesheet" href="../node_modules/reveal.js/plugin/highlight/monokai.css">
+    
+    <!-- Custom styles for layout helpers -->
+    <style>
+        .reveal .r-stack {
+            display: grid;
+            grid-template-rows: 1fr;
+        }
+        
+        .reveal .r-stack > * {
+            grid-area: 1/1;
+            margin: auto;
+        }
+        
+        .reveal .r-hstack {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .reveal .r-vstack {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .reveal .r-stretch {
+            max-width: none;
+            max-height: none;
+        }
+        
+        .reveal .r-frame {
+            border: 1px solid #666;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+            padding: 10px;
+        }
+        
+        .reveal .r-frame:hover {
+            border-color: #999;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.25);
+        }
+        
+        /* Loading indicator */
+        .loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: Arial, sans-serif;
+            font-size: 24px;
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <!-- Container for the presentation -->
+    <div id="presentation-container">
+        <div class="loading">Loading example...</div>
+    </div>
+    
+    <!-- Load the example based on URL parameter -->
+    <script type="module">
+        // Get example name from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const exampleName = urlParams.get('example') || '01-basic-presentation';
+        
+        // Dynamically import the example
+        import(`./${exampleName}.js`)
+            .then(() => {
+                // Remove loading indicator
+                const loading = document.querySelector('.loading');
+                if (loading) loading.remove();
+            })
+            .catch(error => {
+                console.error('Failed to load example:', error);
+                document.getElementById('presentation-container').innerHTML = 
+                    `<div style="text-align: center; margin-top: 50px;">
+                        <h2>Error loading example: ${exampleName}</h2>
+                        <p>${error.message}</p>
+                        <a href="index.html">Back to examples</a>
+                    </div>`;
+            });
+    </script>
+</body>
+</html>

@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fragment Runner Examples</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js/dist/reveal.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js/dist/theme/black.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        .example-box {
+            width: 100px;
+            height: 100px;
+            background: #4ecdc4;
+            margin: 20px auto;
+            transition: all 0.5s ease;
+        }
+        
+        .chart-container {
+            margin: 20px auto;
+        }
+        
+        .hidden {
+            opacity: 0;
+        }
+        
+        .api-result {
+            padding: 20px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            margin: 20px;
+            min-height: 100px;
+        }
+    </style>
+</head>
+<body>
+    <div class="reveal">
+        <div class="slides">
+            
+            <!-- Example 1: Simple DOM manipulation -->
+            <section id="slide1">
+                <h2>DOM Manipulation</h2>
+                <div id="box1" class="example-box"></div>
+                <p id="text1" class="hidden">Fragment 0: Box turns red</p>
+                <p id="text2" class="hidden">Fragment 1: Box scales up</p>
+                <p id="text3" class="hidden">Fragment 2: Box rotates</p>
+                
+                <span class="fragment" data-fragment-index="0"></span>
+                <span class="fragment" data-fragment-index="1"></span>
+                <span class="fragment" data-fragment-index="2"></span>
+            </section>
+            
+            <!-- Example 2: D3.js visualization -->
+            <section id="slide2">
+                <h2>D3.js Visualization</h2>
+                <svg id="d3-chart" width="600" height="400"></svg>
+                
+                <span class="fragment" data-fragment-index="0"></span>
+                <span class="fragment" data-fragment-index="1"></span>
+                <span class="fragment" data-fragment-index="2"></span>
+            </section>
+            
+            <!-- Example 3: Canvas animation -->
+            <section id="slide3">
+                <h2>Canvas Animation</h2>
+                <canvas id="canvas" width="600" height="400"></canvas>
+                
+                <span class="fragment" data-fragment-index="0"></span>
+                <span class="fragment" data-fragment-index="1"></span>
+            </section>
+            
+            <!-- Example 4: API calls and dynamic content -->
+            <section id="slide4">
+                <h2>Dynamic Content</h2>
+                <div id="api-result" class="api-result">
+                    <p>Press space to load content...</p>
+                </div>
+                
+                <span class="fragment" data-fragment-index="0"></span>
+                <span class="fragment" data-fragment-index="1"></span>
+            </section>
+            
+            <!-- Example 5: Media control -->
+            <section id="slide5">
+                <h2>Media Control</h2>
+                <video id="video" width="400" height="300" style="display:none;">
+                    <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+                </video>
+                <audio id="audio" style="display:none;">
+                    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+                </audio>
+                <p id="media-status">Ready to play media</p>
+                
+                <span class="fragment" data-fragment-index="0"></span>
+                <span class="fragment" data-fragment-index="1"></span>
+            </section>
+            
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js/dist/reveal.js"></script>
+    <script src="../src/utils/fragment-runner.js"></script>
+    <script>
+        // Initialize Reveal.js
+        Reveal.initialize({
+            hash: true,
+            plugins: []
+        });
+        
+        // Initialize Fragment Runner
+        FragmentRunner.init(Reveal);
+        
+        // Example 1: DOM Manipulation callbacks - Using new API
+        FragmentRunner.register({
+            slide: 'slide1',
+            fragment: 0,
+            forward: (ctx) => {
+                const box = ctx.slide.querySelector('#box1');
+                box.style.background = '#ff6b6b';
+                ctx.slide.querySelector('#text1').classList.remove('hidden');
+            },
+            backward: (ctx) => {
+                const box = ctx.slide.querySelector('#box1');
+                box.style.background = '#4ecdc4';
+                ctx.slide.querySelector('#text1').classList.add('hidden');
+            }
+        });
+        
+        FragmentRunner.register({
+            slide: 'slide1',
+            fragment: 1,
+            forward: (ctx) => {
+                const box = ctx.slide.querySelector('#box1');
+                box.style.transform = 'scale(1.5)';
+                ctx.slide.querySelector('#text2').classList.remove('hidden');
+            },
+            backward: (ctx) => {
+                const box = ctx.slide.querySelector('#box1');
+                box.style.transform = 'scale(1)';
+                ctx.slide.querySelector('#text2').classList.add('hidden');
+            }
+        });
+        
+        FragmentRunner.register({
+            slide: 'slide1',
+            fragment: 2,
+            forward: (ctx) => {
+                const box = ctx.slide.querySelector('#box1');
+                box.style.transform = 'scale(1.5) rotate(45deg)';
+                ctx.slide.querySelector('#text3').classList.remove('hidden');
+            },
+            backward: (ctx) => {
+                const box = ctx.slide.querySelector('#box1');
+                box.style.transform = 'scale(1.5) rotate(0deg)';
+                ctx.slide.querySelector('#text3').classList.add('hidden');
+            }
+        });
+        
+        // Example 2: D3.js visualization callbacks
+        const svg = d3.select('#d3-chart');
+        const data = [30, 50, 80, 40, 70, 60];
+        const barWidth = 80;
+        const barSpacing = 10;
+        
+        // Create bars with 0 height initially
+        const bars = svg.selectAll('rect')
+            .data(data)
+            .enter()
+            .append('rect')
+            .attr('x', (d, i) => i * (barWidth + barSpacing) + 20)
+            .attr('y', 400)
+            .attr('width', barWidth)
+            .attr('height', 0)
+            .attr('fill', '#4ecdc4');
+        
+        FragmentRunner.register({
+            slide: 'slide2',
+            fragment: 0,
+            id: 'bars-animation',
+            forward: (ctx) => {
+                // Animate bars growing
+                bars.transition()
+                    .duration(800)
+                    .attr('y', d => 400 - d * 4)
+                    .attr('height', d => d * 4);
+            },
+            backward: (ctx) => {
+                // Reverse animation
+                bars.transition()
+                    .duration(400)
+                    .attr('y', 400)
+                    .attr('height', 0);
+            }
+        });
+        
+        FragmentRunner.register({
+            slide: 'slide2',
+            fragment: 1,
+            id: 'color-animation',
+            forward: (ctx) => {
+                // Change colors based on value
+                bars.transition()
+                    .duration(600)
+                    .attr('fill', d => d > 50 ? '#ff6b6b' : '#4ecdc4');
+            },
+            backward: (ctx) => {
+                bars.transition()
+                    .duration(300)
+                    .attr('fill', '#4ecdc4');
+            }
+        });
+        
+        FragmentRunner.register({
+            slide: 'slide2',
+            fragment: 2,
+            id: 'labels-animation',
+            forward: (ctx) => {
+                // Add labels
+                const labels = svg.selectAll('text')
+                    .data(data)
+                    .enter()
+                    .append('text')
+                    .attr('x', (d, i) => i * (barWidth + barSpacing) + 20 + barWidth/2)
+                    .attr('y', d => 400 - d * 4 - 10)
+                    .attr('text-anchor', 'middle')
+                    .attr('fill', 'white')
+                    .style('opacity', 0)
+                    .text(d => d);
+                
+                labels.transition()
+                    .duration(500)
+                    .style('opacity', 1);
+            },
+            backward: (ctx) => {
+                svg.selectAll('text')
+                    .transition()
+                    .duration(300)
+                    .style('opacity', 0)
+                    .remove();
+            }
+        });
+        
+        // Example 3: Canvas animation callbacks
+        const canvas = document.getElementById('canvas');
+        const canvasCtx = canvas.getContext('2d');
+        let particles = [];
+        let animationId;
+        
+        class Particle {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.vx = (Math.random() - 0.5) * 4;
+                this.vy = (Math.random() - 0.5) * 4;
+                this.radius = Math.random() * 3 + 1;
+            }
+            
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                
+                if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+                if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+            }
+            
+            draw(ctx) {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = '#4ecdc4';
+                ctx.fill();
+            }
+        }
+        
+        function animateParticles() {
+            canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.update();
+                p.draw(canvasCtx);
+            });
+            animationId = requestAnimationFrame(animateParticles);
+        }
+        
+        FragmentRunner.register({
+            slide: 'slide3',
+            fragment: 0,
+            forward: (ctx) => {
+                // Create particles
+                particles = [];
+                for (let i = 0; i < 50; i++) {
+                    particles.push(new Particle(
+                        Math.random() * canvas.width,
+                        Math.random() * canvas.height
+                    ));
+                }
+                animateParticles();
+            },
+            backward: (ctx) => {
+                // Stop animation
+                cancelAnimationFrame(animationId);
+                canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
+                particles = [];
+            }
+        });
+        
+        FragmentRunner.register({
+            slide: 'slide3',
+            fragment: 1,
+            forward: (ctx) => {
+                // Add more particles
+                for (let i = 0; i < 50; i++) {
+                    particles.push(new Particle(canvas.width/2, canvas.height/2));
+                }
+            },
+            backward: (ctx) => {
+                // Remove half the particles
+                particles = particles.slice(0, 50);
+            }
+        });
+        
+        // Example 4: API calls (using placeholder API)
+        FragmentRunner.register({
+            slide: 'slide4',
+            fragment: 0,
+            forward: async (ctx) => {
+                const resultDiv = ctx.slide.querySelector('#api-result');
+                resultDiv.innerHTML = '<p>Loading...</p>';
+                
+                try {
+                    // Simulate API call with a timeout
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    const data = {
+                        title: 'Fragment 0 Data',
+                        value: Math.floor(Math.random() * 100),
+                        timestamp: new Date().toLocaleTimeString()
+                    };
+                    
+                    resultDiv.innerHTML = `
+                        <h3>${data.title}</h3>
+                        <p>Value: ${data.value}</p>
+                        <p>Time: ${data.timestamp}</p>
+                    `;
+                } catch (error) {
+                    resultDiv.innerHTML = '<p>Error loading data</p>';
+                }
+            },
+            backward: (ctx) => {
+                const resultDiv = ctx.slide.querySelector('#api-result');
+                resultDiv.innerHTML = '<p>Press space to load content...</p>';
+            }
+        });
+        
+        FragmentRunner.register({
+            slide: 'slide4',
+            fragment: 1,
+            forward: (ctx) => {
+                const resultDiv = ctx.slide.querySelector('#api-result');
+                // Simulate real-time updates
+                const interval = setInterval(() => {
+                    const value = Math.floor(Math.random() * 100);
+                    resultDiv.innerHTML = `
+                        <h3>Live Data Stream</h3>
+                        <p>Current value: ${value}</p>
+                        <p>Updated: ${new Date().toLocaleTimeString()}</p>
+                    `;
+                }, 1000);
+                
+                // Store interval ID for cleanup
+                ctx.slide.dataset.intervalId = interval;
+            },
+            backward: (ctx) => {
+                // Stop real-time updates
+                const intervalId = ctx.slide.dataset.intervalId;
+                if (intervalId) {
+                    clearInterval(intervalId);
+                }
+                const resultDiv = ctx.slide.querySelector('#api-result');
+                resultDiv.innerHTML = '<p>Stream stopped</p>';
+            }
+        });
+        
+        // Example 5: Media control
+        FragmentRunner.register({
+            slide: 'slide5',
+            fragment: 0,
+            forward: (ctx) => {
+                const video = ctx.slide.querySelector('#video');
+                const status = ctx.slide.querySelector('#media-status');
+                video.style.display = 'block';
+                video.play();
+                status.textContent = 'Video playing...';
+            },
+            backward: (ctx) => {
+                const video = ctx.slide.querySelector('#video');
+                const status = ctx.slide.querySelector('#media-status');
+                video.pause();
+                video.style.display = 'none';
+                status.textContent = 'Video paused';
+            }
+        });
+        
+        FragmentRunner.register({
+            slide: 'slide5',
+            fragment: 1,
+            forward: (ctx) => {
+                const audio = ctx.slide.querySelector('#audio');
+                const status = ctx.slide.querySelector('#media-status');
+                audio.volume = 0.3; // Lower volume
+                audio.play();
+                status.textContent = 'Audio playing (30% volume)...';
+            },
+            backward: (ctx) => {
+                const audio = ctx.slide.querySelector('#audio');
+                const status = ctx.slide.querySelector('#media-status');
+                audio.pause();
+                status.textContent = 'Audio stopped';
+            }
+        });
+    </script>
+</body>
+</html>

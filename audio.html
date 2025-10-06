@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Support - Robo-Reveal</title>
+    
+    <!-- Reveal.js CSS from CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.0.4/dist/reveal.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.0.4/dist/theme/white.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.0.4/plugin/highlight/monokai.css">
+    
+    <!-- Robo-Reveal custom styles -->
+    <link rel="stylesheet" href="../styles/robo-reveal.css">
+    
+    <style>
+        /* Ensure presentation container takes full viewport */
+        html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        
+        #presentation-container {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .reveal {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .reveal .slides section {
+            width: 100%;
+            height: 100%;
+        }
+        
+        /* Stack layouts */
+        .reveal .r-vstack {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .reveal .r-hstack {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Fragment styling */
+        .fragment {
+            padding: 20px;
+            margin: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            background: #f9f9f9;
+        }
+        
+        .fragment.visible {
+            background: #e8f5e8;
+            border-color: #4CAF50;
+        }
+    </style>
+</head>
+<body>
+    <div id="presentation-container"></div>
+    
+    <!-- Load dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.0.4/dist/reveal.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.0.4/plugin/highlight/highlight.js"></script>
+    
+    <!-- Load the presentation -->
+    <script type="module">
+        import './audio.js';
+    </script>
+</body>
+</html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animated Table Test - Robo-Reveal</title>
+    
+    <!-- Reveal.js CSS from CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.0.4/dist/reveal.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.0.4/dist/theme/white.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.0.4/plugin/highlight/monokai.css">
+    
+    <!-- KaTeX CSS from CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    
+    <!-- Robo-Reveal custom styles -->
+    <link rel="stylesheet" href="../styles/robo-reveal.css">
+    
+    <!-- Enhanced animations CSS -->
+    <link rel="stylesheet" href="../styles/robo-reveal-animations.css">
+    
+    <style>
+        /* Ensure presentation container takes full viewport */
+        html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        
+        #presentation-container {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .reveal {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .reveal .slides section {
+            width: 100%;
+            height: 100%;
+        }
+        
+        /* Stack layouts - CRITICAL FOR VISIBILITY */
+        .reveal .r-vstack {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .reveal .r-hstack {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            gap: 1em;
+        }
+        
+        .katex-wrapper { display: inline !important; }
+        .katex-wrapper.katex-display { display: block !important; }
+        .katex { color: currentColor !important; font-size: 1em !important; }
+        
+        /* Enhanced table styling */
+        table {
+            font-size: 0.9em;
+        }
+        
+        td {
+            vertical-align: middle !important;
+        }
+        
+        /* Math in tables styling */
+        td .katex-wrapper {
+            display: block !important;
+            text-align: center;
+        }
+        
+        /* Fix for accept/reject icons in table cells */
+        table {
+            table-layout: fixed;
+        }
+        
+        td {
+            position: relative;
+            overflow: visible !important;
+        }
+        
+        /* Ensure icons have space to appear */
+        .reveal-accepted,
+        .reveal-rejected {
+            position: relative !important;
+            display: inline-block !important;
+            padding-right: 40px !important;
+        }
+    </style>
+</head>
+<body>
+    <div id="presentation-container"></div>
+    
+    <!-- Load dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.0.4/dist/reveal.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.0.4/plugin/highlight/highlight.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    
+    <!-- Load the presentation -->
+    <script type="module">
+        import './animated-table-test.js';
+    </script>
+</body>
+</html>
