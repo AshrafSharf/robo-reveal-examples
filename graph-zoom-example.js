@@ -76,11 +76,8 @@ hstack.animatedDiagram(400, 400, {
   showGrid: true,
   xRange: [-10, 10],
   yRange: [-10, 10]
-}, async (container, config) => {
+}, (container, config) => {
   console.log('Left diagram callback called with:', container, config);
-  
-  // Ensure plugins are loaded before creating diagram
-  await pluginsLoaded;
   
   // Create animated diagram with provided dimensions
   const diagram = new AnimatedDiagram(container, config);
@@ -113,11 +110,8 @@ hstack.animatedDiagram(400, 400, {
   showGrid: true,
   xRange: [-5, 5],
   yRange: [-5, 5]
-}, async (container, config) => {
+}, (container, config) => {
   console.log('Right diagram callback called with:', container, config);
-  
-  // Ensure plugins are loaded before creating diagram
-  await pluginsLoaded;
   
   // Create animated diagram with provided dimensions
   const diagram = new AnimatedDiagram(container, config);

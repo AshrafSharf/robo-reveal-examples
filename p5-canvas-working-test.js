@@ -3,11 +3,115 @@ import {
   VStack,
   HStack,
   SVGCanvas,
+  P5Canvas,
   PluginInitializer,
   SlideControllerPlugin,
   AnimatedDiagram,
-  Numberline
+  Numberline,
+  FragmentRunner
 } from 'robo-reveal';
+
+/**
+ * Enhanced Canvas Classes for Fragment Demonstrations
+ */
+
+// Enhanced SVGCanvas with custom mathtext behaviors
+class EnhancedSVGCanvas extends SVGCanvas {
+  constructor(containerElement, options) {
+    super(containerElement, options);
+    this.mathLabelsGroup = null;
+    this.interactionElements = [];
+  }
+  
+  showMathLabels() {
+    if (this.mathLabelsGroup) return; // Already shown
+    
+    // Create a group to contain all math labels
+    this.mathLabelsGroup = this.svgInstance.group();
+    
+    // Add various mathematical expressions using the mathtext method
+    const labels = [
+      { x: 50, y: 100, latex: 'E = mc^2', color: '#e74c3c' },
+      { x: 200, y: 150, latex: '\\int_{-\\infty}^{\\infty} e^{-x^2} dx = \\sqrt{\\pi}', color: '#3498db' },
+      { x: 100, y: 250, latex: '\\sum_{n=1}^{\\infty} \\frac{1}{n^2} = \\frac{\\pi^2}{6}', color: '#2ecc71' }
+    ];
+    
+    labels.forEach(({ x, y, latex, color }) => {
+      const mathElement = this.mathtext(x, y, latex, { color, fontSize: 16 });
+      if (mathElement) {
+        this.mathLabelsGroup.add(mathElement);
+      }
+    });
+  }
+  
+  hideMathLabels() {
+    if (this.mathLabelsGroup) {
+      this.mathLabelsGroup.remove();
+      this.mathLabelsGroup = null;
+    }
+  }
+  
+  enableInteractions() {
+    if (this.interactionElements.length > 0) return; // Already enabled
+    
+    // Add interactive hover effects to existing elements
+    const hoverCircle = this.svgInstance.circle(50)
+      .fill('#f39c12')
+      .stroke({ color: '#e67e22', width: 3 })
+      .center(300, 300)
+      .css('cursor', 'pointer');
+    
+    hoverCircle.mouseover(() => hoverCircle.animate().scale(1.2));
+    hoverCircle.mouseout(() => hoverCircle.animate().scale(1));
+    
+    this.interactionElements.push(hoverCircle);
+  }
+  
+  disableInteractions() {
+    this.interactionElements.forEach(el => el.remove());
+    this.interactionElements = [];
+  }
+}
+
+// Enhanced P5Canvas with custom trail and ball behaviors  
+class EnhancedP5Canvas extends P5Canvas {
+  constructor(containerElement, options) {
+    super(containerElement, options);
+    this.trailEnabled = false;
+    this.extraBalls = [];
+    this.ballColor = [255, 150, 50]; // Original color
+  }
+  
+  enableTrail() {
+    this.trailEnabled = true;
+  }
+  
+  disableTrail() {
+    this.trailEnabled = false;
+  }
+  
+  changeBallColor(newColor) {
+    this.ballColor = newColor;
+  }
+  
+  resetBallColor() {
+    this.ballColor = [255, 150, 50]; // Original color
+  }
+  
+  addExtraBalls() {
+    if (this.extraBalls.length === 0) {
+      this.extraBalls = [
+        { x: 100, y: 100, speedX: 2, speedY: 3, color: [255, 100, 100] },
+        { x: 300, y: 300, speedX: -2.5, speedY: -1.5, color: [100, 255, 100] },
+        { x: 150, y: 250, speedX: 1.5, speedY: -2.5, color: [100, 100, 255] }
+      ];
+    }
+  }
+  
+  removeExtraBalls() {
+    this.extraBalls = [];
+  }
+}
 
 /**
  * P5Canvas Test - Using working graph-zoom pattern
@@ -169,11 +273,12 @@ hstack.animatedDiagram(400, 400, {
   showGrid: true,
   xRange: [-10, 10],
   yRange: [-10, 10]
-}, async (container, config) => {
+}, (container, config) => {
   console.log('Left diagram callback called with:', container, config);
   
-  // Ensure plugins are loaded before creating diagram
-  await pluginsLoaded;
+  // Ensure container has explicit dimensions to prevent negative rect height
+  container.style.width = '400px';
+  container.style.height = '400px';
   
   // Create animated diagram with provided dimensions
   const diagram = new AnimatedDiagram(container, config);
@@ -206,11 +311,12 @@ hstack.animatedDiagram(400, 400, {
   showGrid: true,
   xRange: [-5, 5],
   yRange: [-5, 5]
-}, async (container, config) => {
+}, (container, config) => {
   console.log('Right diagram callback called with:', container, config);
   
-  // Ensure plugins are loaded before creating diagram
-  await pluginsLoaded;
+  // Ensure container has explicit dimensions to prevent negative rect height
+  container.style.width = '400px';
+  container.style.height = '400px';
   
   // Create animated diagram with provided dimensions
   const diagram = new AnimatedDiagram(container, config);
@@ -244,25 +350,68 @@ const combinedCanvasSlide = presentation.slide();
 combinedCanvasSlide.element.setAttribute('data-audio-src', 'https://codeskulptor-demos.commondatastorage.googleapis.com/pang/pop.mp3');
 
 // Add title using HTML content
-combinedCanvasSlide.setContent('<h2>🎨 P5Canvas + SVGCanvas Side-by-Side</h2>');
+combinedCanvasSlide.setContent('<h2>🎨 P5Canvas + SVGCanvas Fragment Demo</h2>');
+
+// Set up invisible effect fragments for canvas animations
+// Fragment 0: Basic animations (auto-start)
+combinedCanvasSlide.effectFragment(0, {
+  onShow: () => console.log('Fragment 0: Basic animations started'),
+  onHide: () => console.log('Fragment 0: Basic animations hidden')
+});
+
+// Fragment 1: Add visual effects
+combinedCanvasSlide.effectFragment(1, {
+  onShow: () => enhancedP5Canvas.enableTrail(),
+  onHide: () => enhancedP5Canvas.disableTrail()
+});
+
+// Fragment 2: Show math labels  
+combinedCanvasSlide.effectFragment(2, {
+  onShow: () => enhancedSVGCanvas.showMathLabels(),
+  onHide: () => enhancedSVGCanvas.hideMathLabels()
+});
+
+// Fragment 3: Interactive elements
+combinedCanvasSlide.effectFragment(3, {
+  onShow: () => {
+    enhancedP5Canvas.changeBallColor([255, 50, 150]);
+    enhancedP5Canvas.addExtraBalls();
+    enhancedSVGCanvas.enableInteractions();
+  },
+  onHide: () => {
+    enhancedP5Canvas.resetBallColor();
+    enhancedP5Canvas.removeExtraBalls();
+    enhancedSVGCanvas.disableInteractions();
+  }
+});
 
 // Create HStack for side-by-side canvas layout
 const combinedHstack = new HStack({ class: 'r-stretch' });
 
-// Left side: P5Canvas with bouncing ball animation
+// Create enhanced canvas instances (declared outside for fragment access)
+let enhancedP5Canvas, enhancedSVGCanvas;
+
+// Create P5Canvas using HStack method - container created automatically
 combinedHstack.p5Canvas(400, 400, {
-  id: 'combined-p5-canvas'
+  id: 'enhanced-p5-canvas'
 }, (p, config, canvasInstance) => {
-  console.log('Combined P5Canvas callback called with:', p, config, canvasInstance);
+  // Create enhanced instance using the canvasInstance
+  enhancedP5Canvas = new EnhancedP5Canvas(canvasInstance.containerElement, config);
+  // Copy necessary properties from the canvasInstance
+  enhancedP5Canvas.p5Instance = canvasInstance.p5Instance;
   
   let ballX = 200, ballY = 200;
   let ballSpeedX = 3, ballSpeedY = 2.5;
   
-  // Simple bouncing ball animation
   p.draw = function() {
-    p.background(30, 60, 120);
+    // Use trail state from enhanced class
+    if (enhancedP5Canvas.trailEnabled) {
+      p.background(30, 60, 120, 50); // Transparent background for trail
+    } else {
+      p.background(30, 60, 120); // Solid background
+    }
     
-    // Update ball position
+    // Update main ball position
     ballX += ballSpeedX;
     ballY += ballSpeedY;
     
@@ -270,30 +419,44 @@ combinedHstack.p5Canvas(400, 400, {
     if (ballX <= 25 || ballX >= 375) ballSpeedX *= -1;
     if (ballY <= 25 || ballY >= 375) ballSpeedY *= -1;
     
-    // Draw ball
-    p.fill(255, 150, 50);
+    // Draw main ball using enhanced class color
+    p.fill(...enhancedP5Canvas.ballColor);
     p.stroke(255);
     p.strokeWeight(3);
     p.circle(ballX, ballY, 50);
+    
+    // Draw extra balls if any
+    enhancedP5Canvas.extraBalls.forEach(ball => {
+      ball.x += ball.speedX;
+      ball.y += ball.speedY;
+      
+      // Bounce extra balls
+      if (ball.x <= 25 || ball.x >= 375) ball.speedX *= -1;
+      if (ball.y <= 25 || ball.y >= 375) ball.speedY *= -1;
+      
+      p.fill(...ball.color);
+      p.circle(ball.x, ball.y, 30);
+    });
     
     // Title text
     p.fill(255);
     p.noStroke();
     p.textAlign(p.CENTER);
     p.textSize(18);
-    p.text('P5Canvas', 200, 30);
+    p.text('Enhanced P5Canvas', 200, 30);
     p.textSize(14);
-    p.text('Bouncing Ball', 200, 50);
+    p.text('Fragment Controls', 200, 50);
   };
-  
-  console.log('Combined P5Canvas created with dimensions:', config.width, 'x', config.height);
 });
 
-// Right side: SVGCanvas with Numberline
+// Create SVGCanvas using HStack method - container created automatically
 combinedHstack.svgCanvas(400, 400, {
-  id: 'combined-svg-canvas'
+  id: 'enhanced-svg-canvas'
 }, (svg, config, canvasInstance) => {
-  console.log('Combined SVGCanvas callback called with:', svg, config, canvasInstance);
+  // Create enhanced instance using the canvasInstance
+  enhancedSVGCanvas = new EnhancedSVGCanvas(canvasInstance.containerElement, config);
+  // Set the svg instance
+  enhancedSVGCanvas.svgInstance = canvasInstance.svgInstance;
   
   // Create a numberline using the Numberline class
   const numberline = new Numberline(-10, 10, 20, svg, {
@@ -307,61 +470,95 @@ combinedHstack.svgCanvas(400, 400, {
   
   // Position the numberline in the center
   numberline.draw();
-  const numberlineGroup = numberline.svgGroup;
-  numberlineGroup.transform({ x: 25, y: 200 });
+  numberline.group.move(25, 200);
   
   // Add title text
-  const titleText = svg.text('SVGCanvas + D3 Scale')
+  svg.text('Enhanced SVGCanvas')
     .font({ size: 18, family: 'Arial', fill: '#333' })
     .cx(200).cy(50);
     
-  const subtitleText = svg.text('Mathematical Numberline')
+  svg.text('Fragment-Controlled Mathtext')
     .font({ size: 14, family: 'Arial', fill: '#666' })
     .cx(200).cy(75);
-    
-  // Add some animated points on the numberline
-  const animatedPoints = [];
-  for (let i = 0; i < 3; i++) {
-    const value = -8 + i * 8; // Points at -8, 0, 8
-    const point = svg.circle(8)
-      .fill(['#ff6b6b', '#4ecdc4', '#45b7d1'][i])
-      .stroke('#fff')
-      .strokeWidth(2);
-    
-    const pointPosition = numberline.scale(value);
-    point.cx(25 + pointPosition).cy(200);
-    animatedPoints.push(point);
-  }
-  
-  // Simple animation for the points
-  let animationFrame = 0;
-  const animate = () => {
-    animationFrame += 0.05;
-    animatedPoints.forEach((point, index) => {
-      const bounce = Math.sin(animationFrame + index * 0.5) * 5;
-      point.cy(200 + bounce);
-    });
-    requestAnimationFrame(animate);
-  };
-  animate();
-  
-  console.log('Combined SVGCanvas created with dimensions:', config.width, 'x', config.height);
 });
 
 // Add HStack to slide
 combinedCanvasSlide.addChild(combinedHstack);
 
-// Initialize the presentation with audio plugin
-(async () => {
-  // Ensure plugins are loaded before initializing presentation
-  await pluginsLoaded;
+// Fifth Slide - SVGCanvas mathtext method demonstration
+const mathtextSlide = presentation.slide();
+mathtextSlide.element.setAttribute('data-audio-src', 'https://codeskulptor-demos.commondatastorage.googleapis.com/pang/pop.mp3');
+
+// Add title using HTML content
+mathtextSlide.setContent('<h2>📐 SVGCanvas mathtext() Method Demo</h2>');
+
+// Create HStack for side-by-side layout
+const mathtextHstack = new HStack({ class: 'r-stretch' });
+
+// Left side: SVGCanvas with direct mathtext usage
+mathtextHstack.svgCanvas(600, 500, {
+  id: 'mathtext-demo-canvas'
+}, (svg, config, canvasInstance) => {
+  console.log('Mathtext demo SVGCanvas callback called with:', svg, config, canvasInstance);
   
-  // Initialize presentation
-  await presentation.initialize();
+  // Add title text
+  const titleText = svg.text('Direct mathtext() Method Usage')
+    .font({ size: 20, family: 'Arial', fill: '#333' })
+    .cx(300).cy(30);
+    
+  // Demonstrate various mathtext examples using the mathtext method directly
+  const examples = [
+    { x: 50, y: 80, latex: '\\int_{-\\infty}^{\\infty} e^{-x^2} dx = \\sqrt{\\pi}', color: '#ff6b6b' },
+    { x: 50, y: 130, latex: '\\sum_{n=1}^{\\infty} \\frac{1}{n^2} = \\frac{\\pi^2}{6}', color: '#4ecdc4' },
+    { x: 50, y: 180, latex: '\\lim_{x \\to 0} \\frac{\\sin x}{x} = 1', color: '#45b7d1' },
+    { x: 50, y: 230, latex: '\\nabla \\cdot \\vec{F} = \\frac{\\partial F_x}{\\partial x} + \\frac{\\partial F_y}{\\partial y}', color: '#f39c12' },
+    { x: 50, y: 280, latex: 'E = mc^2', color: '#e74c3c' },
+    { x: 50, y: 330, latex: '\\alpha + \\beta = \\gamma \\quad \\text{where } \\alpha, \\beta \\in \\mathbb{R}', color: '#9b59b6' },
+    { x: 50, y: 380, latex: '\\begin{bmatrix} a & b \\\\ c & d \\end{bmatrix} \\begin{bmatrix} x \\\\ y \\end{bmatrix} = \\begin{bmatrix} ax+by \\\\ cx+dy \\end{bmatrix}', color: '#1abc9c' }
+  ];
   
-  // Register the audio plugin after Reveal is initialized
-  Reveal.registerPlugin(SlideControllerPlugin);
-})();
+  // Use the mathtext method to create each equation
+  examples.forEach((example, index) => {
+    try {
+      const mathGroup = canvasInstance.mathtext(example.x, example.y, example.latex, {
+        color: example.color,
+        fontSize: 14
+      });
+      
+      if (mathGroup) {
+        console.log(`Created mathtext example ${index + 1}: ${example.latex}`);
+      } else {
+        console.warn(`Failed to create mathtext example ${index + 1}`);
+      }
+    } catch (error) {
+      console.error(`Error creating mathtext example ${index + 1}:`, error);
+    }
+  });
+  
+  // Add some visual dividers
+  const dividers = [70, 120, 170, 220, 270, 320, 370];
+  dividers.forEach(y => {
+    svg.line(30, y, 570, y)
+      .stroke({ color: '#eee', width: 1 });
+  });
+  
+  console.log('Mathtext demo SVGCanvas created with dimensions:', config.width, 'x', config.height);
+});
+
+// Add HStack to slide
+mathtextSlide.addChild(mathtextHstack);
+
+// Initialize plugins first, then presentation
+const initializePresentation = async () => {
+  await PluginInitializer.initialize();
+  const Reveal = await presentation.initialize();
+  
+  // Initialize FragmentRunner after presentation is ready
+  FragmentRunner.init(Reveal);
+  console.log('FragmentRunner initialized');
+};
+
+initializePresentation();
 
 // Export for debugging
 window.presentation = presentation;
