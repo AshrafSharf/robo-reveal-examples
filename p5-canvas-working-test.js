@@ -73,6 +73,59 @@ class EnhancedSVGCanvas extends SVGCanvas {
   }
 }
 
+// Enhanced AnimatedDiagram with on-demand shape creation
+class EnhancedAnimatedDiagram extends AnimatedDiagram {
+  constructor(containerElement, options) {
+    super(containerElement, options);
+    this.shapesCreated = {
+      vector: false,
+      circle: false,
+      point: false,
+      math: false
+    };
+    this.zoomed = false;
+  }
+  
+  showVectorAndLine() {
+    if (!this.shapesCreated.vector) {
+      this.vector({x: 0, y: 0}, {x: 5, y: 5}, 'v1', 'red');
+      this.shapesCreated.vector = true;
+    }
+  }
+  
+  showCirclesAndPolygon() {
+    if (!this.shapesCreated.circle) {
+      this.circle({x: 0, y: 0}, 2, 'origin', 'blue');
+      this.shapesCreated.circle = true;
+    }
+  }
+  
+  showPointAndMath() {
+    if (!this.shapesCreated.point) {
+      this.point({x: 5, y: 5}, 'P', 'green');
+      this.shapesCreated.point = true;
+    }
+    if (!this.shapesCreated.math) {
+      this.mathText({x: 0, y: 0}, '\\int_{-\\infty}^{\\infty} e^{-x^2} dx = \\sqrt{\\pi}', 'red', {fontSize: 12});
+      this.shapesCreated.math = true;
+    }
+  }
+  
+  performZoomIn() {
+    if (!this.zoomed) {
+      this.zoomIn({x: 0, y: 0}, {scale: 0.5, duration: 1});
+      this.zoomed = true;
+    }
+  }
+  
+  performZoomOut() {
+    if (this.zoomed) {
+      this.zoomOut({duration: 1});
+      this.zoomed = false;
+    }
+  }
+}
+
 // Enhanced P5Canvas with custom trail and ball behaviors  
 class EnhancedP5Canvas extends P5Canvas {
   constructor(containerElement, options) {
@@ -267,7 +320,9 @@ graphSlide.addChild(controlsHStack);
 const hstack = new HStack({ class: 'r-stretch' });
 
 // Using new simplified API with explicit dimensions
-// First diagram (left side)
+// First diagram (left side) - declare outside for fragment access
+let enhancedLeftDiagram;
+
 hstack.animatedDiagram(400, 400, {
   id: 'left-graph',
   showGrid: true,
@@ -280,32 +335,70 @@ hstack.animatedDiagram(400, 400, {
   container.style.width = '400px';
   container.style.height = '400px';
   
-  // Create animated diagram with provided dimensions
-  const diagram = new AnimatedDiagram(container, config);
-  
-  // Add shapes with fragment indices
-  diagram.vector({x: 0, y: 0}, {x: 5, y: 5}, 'v1', 'red', {fragmentIndex: 0});
-  diagram.circle({x: 0, y: 0}, 2, 'origin', 'blue', {fragmentIndex: 1});
-  diagram.point({x: 5, y: 5}, 'P', 'green', {fragmentIndex: 2});
-  
-  // Add complex LaTeX math at origin for testing
-  diagram.mathText({x: 0, y: 0}, '\\int_{-\\infty}^{\\infty} e^{-x^2} dx = \\sqrt{\\pi}', 'red', {fragmentIndex: 2, fontSize: 12});
-  
-  // Add zoom animations to the queue
-  diagram.zoomIn({x: 0, y: 0}, {scale: 0.5, duration: 1, fragmentIndex: 3});
-  diagram.zoomOut({duration: 1, fragmentIndex: 4});
+  // Create enhanced animated diagram with provided dimensions
+  enhancedLeftDiagram = new EnhancedAnimatedDiagram(container, config);
   
   console.log('Left diagram created with dimensions:', config.width, 'x', config.height);
   
   // Return cleanup function
   return () => {
     console.log('Cleaning up left diagram');
-    diagram.clearAll();
-    diagram.destroy();
+    enhancedLeftDiagram.clearAll();
+    enhancedLeftDiagram.destroy();
   };
 });
 
-// Second diagram (right side)
+// Second diagram (right side) - enhanced class with different shapes
+class EnhancedRightDiagram extends AnimatedDiagram {
+  constructor(containerElement, options) {
+    super(containerElement, options);
+    this.shapesCreated = {
+      line: false,
+      polygon: false,
+      math: false
+    };
+    this.zoomed = false;
+  }
+  
+  showVectorAndLine() {
+    if (!this.shapesCreated.line) {
+      this.line({x: -3, y: -3}, {x: 3, y: 3}, 'diagonal', 'purple');
+      this.shapesCreated.line = true;
+    }
+  }
+  
+  showCirclesAndPolygon() {
+    if (!this.shapesCreated.polygon) {
+      this.polygon([{x: -2, y: -2}, {x: 2, y: -2}, {x: 2, y: 2}, {x: -2, y: 2}], 'square', 'orange');
+      this.shapesCreated.polygon = true;
+    }
+  }
+  
+  showPointAndMath() {
+    if (!this.shapesCreated.math) {
+      this.mathText({x: 0, y: 0}, '\\sum_{n=1}^{\\infty} \\frac{1}{n^2} = \\frac{\\pi^2}{6}', 'purple', {fontSize: 12});
+      this.shapesCreated.math = true;
+    }
+  }
+  
+  performZoomIn() {
+    if (!this.zoomed) {
+      this.zoomIn({x: 0, y: 0}, {scale: 0.5, duration: 1});
+      this.zoomed = true;
+    }
+  }
+  
+  performZoomOut() {
+    if (this.zoomed) {
+      this.zoomOut({duration: 1});
+      this.zoomed = false;
+    }
+  }
+}
+
+// Declare outside for fragment access
+let enhancedRightDiagram;
+
 hstack.animatedDiagram(400, 400, {
   id: 'right-graph',
   showGrid: true,
@@ -318,32 +411,89 @@ hstack.animatedDiagram(400, 400, {
   container.style.width = '400px';
   container.style.height = '400px';
   
-  // Create animated diagram with provided dimensions
-  const diagram = new AnimatedDiagram(container, config);
-  
-  // Add shapes with fragment indices
-  diagram.line({x: -3, y: -3}, {x: 3, y: 3}, 'diagonal', 'purple', {fragmentIndex: 0});
-  diagram.polygon([{x: -2, y: -2}, {x: 2, y: -2}, {x: 2, y: 2}, {x: -2, y: 2}], 'square', 'orange', {fragmentIndex: 1});
-  
-  // Add complex LaTeX math expression at origin for testing
-  diagram.mathText({x: 0, y: 0}, '\\sum_{n=1}^{\\infty} \\frac{1}{n^2} = \\frac{\\pi^2}{6}', 'purple', {fragmentIndex: 2, fontSize: 12});
-  
-  // Add zoom animations to the queue
-  diagram.zoomIn({x: 0, y: 0}, {scale: 0.5, duration: 1, fragmentIndex: 3});
-  diagram.zoomOut({duration: 1, fragmentIndex: 4});
+  // Create enhanced animated diagram with provided dimensions
+  enhancedRightDiagram = new EnhancedRightDiagram(container, config);
   
   console.log('Right diagram created with dimensions:', config.width, 'x', config.height);
   
   // Return cleanup function
   return () => {
     console.log('Cleaning up right diagram');
-    diagram.clearAll();
-    diagram.destroy();
+    enhancedRightDiagram.clearAll();
+    enhancedRightDiagram.destroy();
   };
 });
 
 // Add HStack to slide
 graphSlide.addChild(hstack);
+
+// Set up effect fragments to control the enhanced diagrams
+// Fragment 0: Show vectors and line
+graphSlide.effectFragment(0, {
+  onShow: () => {
+    console.log('Fragment 0: Show vectors and line');
+    if (enhancedLeftDiagram) enhancedLeftDiagram.showVectorAndLine();
+    if (enhancedRightDiagram) enhancedRightDiagram.showVectorAndLine();
+  },
+  onHide: () => {
+    console.log('Fragment 0: Hide vectors and line');
+    // Shapes remain visible when navigating backwards
+  }
+});
+
+// Fragment 1: Show circles and polygon
+graphSlide.effectFragment(1, {
+  onShow: () => {
+    console.log('Fragment 1: Show circles and polygon');
+    if (enhancedLeftDiagram) enhancedLeftDiagram.showCirclesAndPolygon();
+    if (enhancedRightDiagram) enhancedRightDiagram.showCirclesAndPolygon();
+  },
+  onHide: () => {
+    console.log('Fragment 1: Hide circles and polygon');
+    // Don't hide previous shapes, just this fragment's shapes
+  }
+});
+
+// Fragment 2: Show point and math
+graphSlide.effectFragment(2, {
+  onShow: () => {
+    console.log('Fragment 2: Show point and math');
+    if (enhancedLeftDiagram) enhancedLeftDiagram.showPointAndMath();
+    if (enhancedRightDiagram) enhancedRightDiagram.showPointAndMath();
+  },
+  onHide: () => {
+    console.log('Fragment 2: Hide point and math');
+    // Don't hide previous shapes, just this fragment's shapes
+  }
+});
+
+// Fragment 3: Zoom in to center
+graphSlide.effectFragment(3, {
+  onShow: () => {
+    console.log('Fragment 3: Zoom in to center');
+    if (enhancedLeftDiagram) enhancedLeftDiagram.performZoomIn();
+    if (enhancedRightDiagram) enhancedRightDiagram.performZoomIn();
+  },
+  onHide: () => {
+    console.log('Fragment 3: Zoom out from center');
+    if (enhancedLeftDiagram) enhancedLeftDiagram.performZoomOut();
+    if (enhancedRightDiagram) enhancedRightDiagram.performZoomOut();
+  }
+});
+
+// Fragment 4: Zoom out
+graphSlide.effectFragment(4, {
+  onShow: () => {
+    console.log('Fragment 4: Zoom out');
+    if (enhancedLeftDiagram) enhancedLeftDiagram.performZoomOut();
+    if (enhancedRightDiagram) enhancedRightDiagram.performZoomOut();
+  },
+  onHide: () => {
+    console.log('Fragment 4: Zoom back in');
+    if (enhancedLeftDiagram) enhancedLeftDiagram.performZoomIn();
+    if (enhancedRightDiagram) enhancedRightDiagram.performZoomIn();
+  }
+});
 
 // Fourth Slide - P5Canvas + SVGCanvas Side-by-Side Demo
 const combinedCanvasSlide = presentation.slide();
